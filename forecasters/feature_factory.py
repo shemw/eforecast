@@ -48,7 +48,7 @@ class FeatureFactory:
         """Need to be careful of look-ahead leakage. Use the right edge to compute rolling stats
         Lag the y-value by 1 so as to not include the value we want to predict in the rolling stat"""
 
-        y_lag = self.y.shift(1)
+        y_lag = self.y.shift(7)
         mean_x = y_lag.rolling(mean_window, min_periods=3, center=False).mean().rename(f"mean_{mean_window}")
         median_x = y_lag.rolling(median_window, min_periods=3, center=False).median().rename(f"median_{median_window}")
         stdev_x = y_lag.rolling(stdev_window, min_periods=3, center=False).std().rename(f"stdev_{stdev_window}")
