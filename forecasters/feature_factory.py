@@ -59,10 +59,18 @@ class FeatureFactory:
         return pd.concat([mean_x, median_x, stdev_x], axis=1, ignore_index=False)
 
 
+    def create_temperature_features(self, temperature_cols):
+        "Requires input df to have weather data"
 
+        print(f"Creating temperature feature for {temperature_cols}")
+        return self.input_df.loc[:, temperature_cols]
 
-    def create_temperature_features(self):
-        pass
+    def create_daylength_features(self, sunrise_col, sunset_col):
+
+        print(f"Creating daylength feature using cols: {sunrise_col, sunset_col}")
+        time_diff = pd.to_datetime(self.input_df[sunset_col]) - pd.to_datetime(self.input_df[sunrise_col])
+        return (time_diff/pd.to_timedelta(1, unit="h")).rename("daylength")
+
 
     def create_temperature_forecast_features(self):
         """Could potentially be used as a leading indicator"""
