@@ -10,7 +10,6 @@ from tqdm import tqdm
 from forecasters import boosted_hybrid as bh
 
 
-
 class ValidateForecaster:
     """Loops over a number of train/test periods, contiguous in time, and stores error metrics for each run"""
 
