@@ -1,5 +1,6 @@
 import pandas as pd
 
+
 class BoostedHybrid:
     """Fit a simple lin regression model (model_1), subtract this from the targets and fit a boosted ML
     model (model_2) to predict the residuals."""
@@ -15,7 +16,7 @@ class BoostedHybrid:
                              index=X_1.index,
                              columns=["y_fit"])
 
-        y_resid = y.y - y_fit.y_fit
+        y_resid = y - y_fit.y_fit
 
         # fit model_2 on residuals
         self.model_2.fit(X_2, y_resid)
