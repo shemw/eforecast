@@ -14,10 +14,11 @@ from forecasters import boosted_hybrid as bh
 class ValidateForecaster:
     """Loops over a number of train/test periods, contiguous in time, and stores error metrics for each run"""
 
-    def __init__(self, X_1, X_2, y):
+    def __init__(self, X_1, X_2, y, xgb_tuning_params={}):
         self.X_1 = X_1
         self.X_2 = X_2
         self.y = y
+        self.xgb_tuning_params = xgb_tuning_params
 
     def run(self, num_samples=10, train_len=365, test_len=7, error_metric=metrics.mean_absolute_error,
             plotting=True):
@@ -47,7 +48,7 @@ class ValidateForecaster:
 
         # Instantiate boosted model class
         model = bh.BoostedHybrid(model_1=LinearRegression(),
-                                 model_2=XGBRegressor())
+                                 model_2=XGBRegressor(**self.xgb_tuning_params))
 
         # Loop over all train/test samples
         for iteration, idx in tqdm(enumerate(samples_df.index)):
@@ -78,7 +79,7 @@ class ValidateForecaster:
             get_error(error_test_boost, error_metric, y_test, y_forecast.y_pred_boosted)
 
             if iteration in iterations_to_plot:
-                random_plots(y_test, y_forecast, y_train, y_fit, iteration)
+                plot_samples(y_test, y_forecast, y_train, y_fit, iteration)
 
         error_df = pd.DataFrame(data={f"{error_metric.__name__}_train_xgb": error_train_boost,
                                       f"{error_metric.__name__}_train_reg": error_train,
@@ -115,21 +116,19 @@ def get_error(list_to_append, error_metric, actual, predicted):
     list_to_append.append(error_metric(actual, predicted))
 
 
-def random_plots(y_test, y_forecast, y_train, y_fit, iteration):
-
-    # Plot target and predicted target
+def plot_samples(y_test, y_forecast, y_train, y_fit, iteration):
 
     ax = y_train.plot(alpha=1, figsize=(14, 5.5), label="Actual")
-    ax = y_fit.iloc[:, 0].plot(ax=ax, linewidth=1, label="Reg_Predict", color="r", linestyle=":")
-    ax = y_fit.iloc[:, 1].plot(ax=ax, linewidth=1, label="XGB_Predict", color="g", linestyle="--")
+    ax = y_fit.y_pred.plot(ax=ax, linewidth=1, label="Reg_Predict", color="r", linestyle=":")
+    ax = y_fit.y_pred_boosted.plot(ax=ax, linewidth=1, label="XGB_Predict", color="g", linestyle="--")
     ax.set_title(f"Train Validation for sample {iteration}")
     ax.set_ylabel("Energy (kWh)")
     plt.legend()
     plt.show()
 
     ax = y_test.plot(alpha=0.5, figsize=(14, 5.5), label="Actual", marker="+")
-    ax = y_forecast.iloc[:, 0].plot(ax=ax, linewidth=2, label="Reg_Predict", color="r", linestyle=":", marker="*")
-    ax = y_forecast.iloc[:, 1].plot(ax=ax, linewidth=2, label="XGB_Predict", color="g", linestyle="--", marker="o")
+    ax = y_forecast.y_pred.plot(ax=ax, linewidth=2, label="Reg_Predict", color="r", linestyle=":", marker="*")
+    ax = y_forecast.y_pred_boosted.plot(ax=ax, linewidth=2, label="XGB_Predict", color="g", linestyle="--", marker="o")
     ax.set_title(f"Forecast Validation for sample {iteration}")
     ax.set_ylabel("Energy (kWh)")
     plt.legend()
