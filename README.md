@@ -4,9 +4,9 @@
 
 1. [Introduction](#introduction)
 2. [Usage](#usage)
-3. [Virtual Environment](#virtual environment)
-4. [Installing Dependencies](#installing dependencies)
-5. [Running Tests](#running tests)
+3. [Virtual Environment](#virtual-environment)
+4. [Installing Dependencies](#installing-dependencies)
+5. [Running Tests](#running-tests)
 
 ## Introduction
 
