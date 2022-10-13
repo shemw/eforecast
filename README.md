@@ -24,12 +24,16 @@ the notebook in `interactive/prepare_data.ipynb` which has links to a larger dat
 
 ## Virtual Environment
 
-It is recommended to run the model from a virtual environment (e.g. pyenv)
+It is recommended to run the model from a virtual environment (e.g. pyenv), installing the dependencies as specified below.
 
 ## Installing Dependencies
 
 ```bash
 pip install -e .[dev,test]
+
+OR
+
+pip install -r requirements.txt
 ```
 
 ## Running Tests
