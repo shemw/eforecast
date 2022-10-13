@@ -6,6 +6,15 @@ class BoostedHybrid:
     model (model_2) to predict the residuals."""
 
     def __init__(self, model_1, model_2):
+
+        """Parameters
+        --------------
+        model_1 : class
+            a valid simple ML model class, currently accepts LinearRegression class sklearn.linear_model
+        model_2 : class
+            a boosted tree ML model class, currently accepts XGBRegressor class from xgboost
+        """
+
         self.model_1 = model_1
         self.model_2 = model_2
 
@@ -20,7 +29,6 @@ class BoostedHybrid:
 
         # fit model_2 on residuals
         self.model_2.fit(X_2, y_resid)
-
 
     def predict(self, X_1, X_2):
         # Define predict method for boosted hybrid
