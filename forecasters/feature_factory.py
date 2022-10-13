@@ -1,17 +1,23 @@
 import pandas as pd
-import numpy as np
-import sklearn.linear_model
 from statsmodels.tsa.deterministic import DeterministicProcess, CalendarFourier
-from sklearn.linear_model import LinearRegression
 
 
 class FeatureFactory:
+    """ Class to create time-based features from an input df which includes a timeseries index"""
 
     def __init__(self, df):
+        """Parameters
+        --------------
+        df : dataframe
+            A dataframe object which includes the following as a minimum:
+                - a timeseries index
+                - at least one feature column
+                - a target column labeled 'y'
+        """
+
         self.input_df = df
         self.y = self.input_df.y
         self.index = self.input_df.index
-
         #TODO Check idx is datetime and same length as y
 
     def create_time_trend_features(self, order):
@@ -22,7 +28,6 @@ class FeatureFactory:
                                   drop=True)
 
         print(f"Creating time trend features of order: {order}")
-
         return dp.in_sample()
 
     def create_lag_features(self, lag_steps=1):
@@ -41,12 +46,22 @@ class FeatureFactory:
                                   drop=True)
 
         print(f"Creating seasonal features for Fourier freq: {freq} and Fourier order: {fourier_order}")
-
         return dp.in_sample()
 
     def create_statistical_features(self, mean_window, median_window, stdev_window):
-        """Need to be careful of look-ahead leakage. Use the right edge to compute rolling stats
-        Lag the y-value by 1 so as to not include the value we want to predict in the rolling stat"""
+        """Creates statistical features if mean, median and stdev
+        TO avoid look-ahead leakage, uses the right edge to compute rolling stats
+        Lags the y-value by 1 so as to not include the value we want to predict in the rolling stats
+
+        Parameters
+        ----------
+        mean_window : int
+            Time window over which to calc the statistical feature, e.g. 7 returns a rolling mean over 7 days
+        median_window : int
+            As above
+        stdev_window : int
+            As above
+        """
 
         y_lag = self.y.shift(7)
         mean_x = y_lag.rolling(mean_window, min_periods=3, center=False).mean().rename(f"mean_{mean_window}")
@@ -58,19 +73,20 @@ class FeatureFactory:
 
         return pd.concat([mean_x, median_x, stdev_x], axis=1, ignore_index=False)
 
-
     def create_temperature_features(self, temperature_cols):
-        "Requires input df to have weather data"
+        """Creates temperature features.
+        Requires temperature data to be present in df used to instantiate the class"""
 
         print(f"Creating temperature feature for {temperature_cols}")
         return self.input_df.loc[:, temperature_cols]
 
     def create_daylength_features(self, sunrise_col, sunset_col):
+        """Creates daylength (hours between sunrise and sunset) features.
+        Requires sunrise and sunset data to be present in df used to instantiate the class"""
 
         print(f"Creating daylength feature using cols: {sunrise_col, sunset_col}")
         time_diff = pd.to_datetime(self.input_df[sunset_col]) - pd.to_datetime(self.input_df[sunrise_col])
         return (time_diff/pd.to_timedelta(1, unit="h")).rename("daylength")
-
 
     def create_temperature_forecast_features(self):
         """Could potentially be used as a leading indicator"""
