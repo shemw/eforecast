@@ -1,4 +1,4 @@
-# eforecast
+# eforecast - Boosted Hybrid Energy Forecaster
 
 ## Contents
 
@@ -10,7 +10,7 @@
 
 ## Introduction
 
-Code for implementing a forecast model to predict daily houshold energy consumption 7 days in advance.
+Code for implementing a Boosted Hybrid Forecast model to predict daily houshold energy consumption 7 days in advance.
 The forecaster applies a linear regression model based on time series features. 
 It then applies XGBoost to predict the residuals from the linear regression model.
 The two models are combined to form a hybrid boosted model, attempting to improve accuracy.
