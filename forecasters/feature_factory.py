@@ -48,10 +48,10 @@ class FeatureFactory:
         print(f"Creating seasonal features for Fourier freq: {freq} and Fourier order: {fourier_order}")
         return dp.in_sample()
 
-    def create_statistical_features(self, mean_window, median_window, stdev_window):
+    def create_statistical_features(self, mean_window, median_window, stdev_window, lag=7):
         """Creates statistical features if mean, median and stdev
         TO avoid look-ahead leakage, uses the right edge to compute rolling stats
-        Lags the y-value by 1 so as to not include the value we want to predict in the rolling stats
+        Lags the y-value by 7 days so as to not include the values we want to predict in the rolling stats
 
         Parameters
         ----------
@@ -61,9 +61,11 @@ class FeatureFactory:
             As above
         stdev_window : int
             As above
+        lag : int
+            Number of steps to lag the data on which the stats are created. Default = 7.
         """
 
-        y_lag = self.y.shift(7)
+        y_lag = self.y.shift(lag)
         mean_x = y_lag.rolling(mean_window, min_periods=3, center=False).mean().rename(f"mean_{mean_window}")
         median_x = y_lag.rolling(median_window, min_periods=3, center=False).median().rename(f"median_{median_window}")
         stdev_x = y_lag.rolling(stdev_window, min_periods=3, center=False).std().rename(f"stdev_{stdev_window}")
