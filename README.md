@@ -1,4 +1,5 @@
-# eforecast - Boosted Hybrid Energy Forecaster
+# eforecast
+Boosted Hybrid Energy Forecaster
 
 ## Contents
 
